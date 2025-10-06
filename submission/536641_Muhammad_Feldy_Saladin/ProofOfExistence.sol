@@ -1,0 +1,27 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+contract ProofOfExistence {
+    address public owner;
+    mapping(bytes32 => uint256) public proofs;
+    
+    event DocumentNotarized(address indexed notarizer, bytes32 indexed documentHash, uint256 timestamp);
+    
+    constructor() {
+        owner = msg.sender;
+    }
+    
+    function notarizeDocument(bytes32 _documentHash) external {
+        require(proofs[_documentHash] == 0, "Document already notarized");
+        proofs[_documentHash] = block.timestamp;
+        emit DocumentNotarized(msg.sender, _documentHash, block.timestamp);
+    }
+    
+    function verifyDocument(bytes32 _documentHash) external view returns (bool) {
+        return proofs[_documentHash] > 0;
+    }
+    
+    function getDocumentTimestamp(bytes32 _documentHash) external view returns (uint256) {
+        return proofs[_documentHash];
+    }
+}
